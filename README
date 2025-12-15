@@ -1,0 +1,98 @@
+# Training Academy Management System
+
+**Odoo Version:** 18.0
+
+A comprehensive Odoo module for managing training academies, courses, student enrollments, and instructor assignments.
+
+---
+
+## Features
+
+### **Courses**
+
+- Course management with categories
+- Auto-uppercase course codes
+- Enrollment capacity tracking (enrolled_count, available_seats, is_full)
+- Workflow: Draft → Published → In Progress → Done/Cancelled
+- Smart buttons showing enrollment statistics
+- Validations: unique codes, valid dates, positive capacity
+
+### **Enrollments**
+
+- Student course registration
+- Grade and attendance tracking (0-100%)
+- Workflow: Draft → Confirmed → Completed/Cancelled
+- Prevents duplicate enrollments and full course registrations
+- Kanban view grouped by state
+
+### **Partner Extension**
+
+- Student/Instructor role flags
+- Smart buttons for enrolled/teaching courses
+- Relationship tracking between students, instructors, and courses
+
+### **Security**
+
+- **Students:** View published courses, manage own enrollments
+- **Instructors:** Full course management, read-only enrollments
+- **Managers:** Full system access
+
+---
+
+**Activate:**
+
+1. Apps → Update Apps List
+2. Search " Academy"
+3. Activate
+
+---
+
+## Usage
+
+**Students:**
+
+- Browse: Academy → Courses → Courses
+- Enroll: Academy → Enrollments → My Enrollments → New
+- Track grades and attendance
+
+**Instructors:**
+
+- Manage courses with workflow buttons
+- View enrollments via smart button (read-only)
+
+**Managers:**
+
+- Full access to all records
+- Configuration menu access
+- User management
+
+---
+
+## Module Structure
+
+```
+academy/
+├── models/          # Python models (course, enrollment, category, partner)
+├── views/           # XML views and menus
+├── security/        # Groups, rules, access rights
+└── static/          # Icons and assets
+```
+
+### **Key Models:**
+
+- `academy.course` - Courses with workflow and capacity tracking
+- `academy.enrollment` - Student enrollments with grades
+- `academy.course.category` - Course categorization
+- `res.partner` - Extended with student/instructor roles
+
+---
+
+## Testing
+
+- Create course with auto-uppercase code
+- Enroll student in available course
+- Verify enrollment in full course fails
+- Check duplicate enrollment prevention
+- Test course workflow transitions
+- Verify computed fields (enrolled_count, available_seats)
+- Confirm security rules per role
