@@ -1,113 +1,95 @@
-# Academy Lab (academy) — Odoo 18 Module
+# Training Academy Management System
 
-Training Academy Management System for Odoo 18. Manage courses, categories, enrollments, instructors, and students with workflows, security rules, and capacity tracking.
+**Odoo Version:** 18.0
 
----
-
-##  Core Features
-
-- **Courses (`academy.course`)**
-  - Workflow: Draft → Published → In Progress → Done / Cancelled
-  - Auto-uppercase unique course codes
-  - Stored computed fields:
-    - `enrolled_count` – number of confirmed enrollments
-    - `available_seats` – `max_students - enrolled_count` (never negative)
-    - `is_full` – `True` when no seats left
-    - `instructor_name` – related to instructor partner
-  - Validations: unique code, end date after start date, positive `max_students`
-  - UI:
-    - List view with state-based decorations and full/available indicators
-    - Form view with statusbar, smart button for enrollments, and chatter
-    - Kanban view grouped by state (done, in progress, published, etc.)
-
-- **Categories (`academy.course.category`)**
-  - Organize courses by category
-  - Stored computed field: `course_count`
-  - Notebook page listing related courses (with inline overview)
-
-- **Enrollments (`academy.enrollment`)**
-  - Workflow: Draft → Confirmed → Completed / Cancelled
-  - Business rules:
-    - Prevent confirming when course is full
-    - Prevent duplicate (student, course) via SQL constraint
-  - Stored computed field:
-    - `passed` – `True` when `grade >= 60` and `attendance_percentage >= 75`
-  - UI:
-    - List and form views with chatter
-    - Search filters by state and basic fields
-
-- **Partner Extension (`res.partner`)**
-  - Role flags: `is_student`, `is_instructor`
-  - Relations:
-    - `student_enrollment_ids` – one2many to enrollments
-    - `instructor_course_ids` – one2many to courses
-  - Stored counters:
-    - `total_courses_enrolled`
-    - `total_courses_teaching`
-  - Smart buttons:
-    - “Enrolled Courses”
-    - “Teaching Courses”
-  - Extra “Academy” tab for role flags
+A comprehensive Odoo module for managing training academies, courses, student enrollments, and instructor assignments.
 
 ---
 
-##  Module Info
+## Features
 
-- **Technical name:** `academy`  
-- **Dependencies:** `base`, `mail`, `contacts`  
-- **License:** LGPL-3  
+**Courses**
 
----
+Course management with categories, auto-uppercase course codes, and enrollment capacity tracking (enrolled_count, available_seats, is_full). Workflow: Draft → Published → In Progress → Done/Cancelled. Smart buttons showing enrollment statistics. Validations: unique codes, valid dates, positive capacity.
 
-##  Installation
+**Enrollments**
 
-1. Place the `academy` folder under your Odoo `addons` path (e.g. `addons/academy`).  
-2. Ensure `addons_path` in `odoo.conf` includes this project’s `addons` directory.  
-3. Restart Odoo, enable Developer Mode, go to **Apps → Update Apps List**.  
-4. Search for **“Academy Lab Module”** or **“Academy”** and click **Install**.  
+Student course registration with grade and attendance tracking (0-100%). Workflow: Draft → Confirmed → Completed/Cancelled. Prevents duplicate enrollments and full course registrations. Kanban view grouped by state.
 
----
+**Partner Extension**
 
-##  Menu Navigation
+Student/Instructor role flags with smart buttons for enrolled/teaching courses. Relationship tracking between students, instructors, and courses.
 
-Academy (main menu)  
-├── **Courses**  
-│   ├── Courses (`academy.course`)  
-│   └── Categories (`academy.course.category`)  
-└── **Enrollment**  
-    └── Enrollments (`academy.enrollment`)
+**Security**
 
-Partner actions are available on the standard **Contacts** form (smart buttons + Academy tab).
+Students can view published courses and manage own enrollments. Instructors have full course management with read-only enrollments. Managers have full system access.
 
 ---
 
-##  Security Overview
+## Installation
 
-- **Groups** (hierarchical):
-  - `Academy Student`
-  - `Academy Instructor` (implies Student)
-  - `Academy Manager` (implies Instructor)
-
-- **Record rules (simplified):**
-  - Students:
-    - See only **published** courses  
-    - See only their own enrollments  
-  - Instructors:
-    - See all courses and enrollments  
-  - Managers:
-    - Full access to all academy records  
-
-Model-level access (CRUD) is defined in `security/ir.model.access.csv` and combined with record rules.
+1. Apps → Update Apps List
+2. Search "Academy"
+3. Activate
 
 ---
 
-##  Quick Testing Checklist
+## Usage
 
-1. Create sample categories, courses, students, and instructors.  
-2. Confirm enrollments until a course is full → last confirmation should raise an error.  
-3. Try a second enrollment for the same student & course → SQL constraint error.  
-4. Verify students see only **published** courses, while managers see all.  
-5. Change grades/attendance and confirm `passed` updates as expected.  
-6. Check that course code is auto-uppercased and cannot be duplicated.  
+**Students**
 
+Browse courses: Academy → Courses → Courses
 
+Enroll in courses: Academy → Enrollments → My Enrollments → New
+
+Track grades and attendance in enrollment records
+
+**Instructors**
+
+Manage courses with workflow buttons (Publish, Start, Complete, Cancel)
+
+View enrollments via smart button (read-only access)
+
+**Managers**
+
+Full access to all records and configuration menu
+
+User management and system administration
+
+---
+
+## Module Structure
+
+academy/
+├── models/          Python models (course, enrollment, category, partner)
+├── views/           XML views and menus
+├── security/        Groups, rules, access rights
+└── static/          Icons and assets
+
+**Key Models**
+
+academy.course - Courses with workflow and capacity tracking
+
+academy.enrollment - Student enrollments with grades
+
+academy.course.category - Course categorization
+
+res.partner - Extended with student/instructor roles
+
+---
+
+## Testing
+
+Create course with auto-uppercase code
+
+Enroll student in available course
+
+Verify enrollment in full course fails
+
+Check duplicate enrollment prevention
+
+Test course workflow transitions
+
+Verify computed fields (enrolled_count, available_seats)
+
+Confirm security rules per role
