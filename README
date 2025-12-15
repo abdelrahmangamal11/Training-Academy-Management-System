@@ -1,10 +1,10 @@
- Academy Lab (academy) — Odoo 18 Module
+# Academy Lab (academy) — Odoo 18 Module
 
 Training Academy Management System for Odoo 18. Manage courses, categories, enrollments, instructors, and students with workflows, security rules, and capacity tracking.
 
 ---
 
- Core Features
+##  Core Features
 
 - **Courses (`academy.course`)**
   - Workflow: Draft → Published → In Progress → Done / Cancelled
@@ -51,7 +51,7 @@ Training Academy Management System for Odoo 18. Manage courses, categories, enro
 
 ---
 
- Module Info
+##  Module Info
 
 - **Technical name:** `academy`  
 - **Dependencies:** `base`, `mail`, `contacts`  
@@ -59,7 +59,7 @@ Training Academy Management System for Odoo 18. Manage courses, categories, enro
 
 ---
 
-Installation
+##  Installation
 
 1. Place the `academy` folder under your Odoo `addons` path (e.g. `addons/academy`).  
 2. Ensure `addons_path` in `odoo.conf` includes this project’s `addons` directory.  
@@ -68,7 +68,7 @@ Installation
 
 ---
 
- Menu Navigation
+##  Menu Navigation
 
 Academy (main menu)  
 ├── **Courses**  
@@ -81,7 +81,7 @@ Partner actions are available on the standard **Contacts** form (smart buttons +
 
 ---
 
- Security Overview
+##  Security Overview
 
 - **Groups** (hierarchical):
   - `Academy Student`
@@ -101,7 +101,7 @@ Model-level access (CRUD) is defined in `security/ir.model.access.csv` and combi
 
 ---
 
-Quick Testing Checklist
+##  Quick Testing Checklist
 
 1. Create sample categories, courses, students, and instructors.  
 2. Confirm enrollments until a course is full → last confirmation should raise an error.  
