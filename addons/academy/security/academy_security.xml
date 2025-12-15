@@ -1,0 +1,70 @@
+<odoo>
+        <!-- Category -->
+        <record id="module_category_academy" model="ir.module.category">
+            <field name="name">Academy</field>
+            <field name="sequence">1</field>
+        </record>
+
+        <!-- Student Group -->
+        <record id="academy_group_student" model="res.groups">
+            <field name="name">Academy Student</field>
+            <field name="category_id" ref="module_category_academy"/>
+        </record>
+        
+        <!-- Instructor Group -->
+        <record id="academy_group_instructor" model="res.groups">
+            <field name="name">Academy Instructor</field>
+            <field name="implied_ids" eval="[(4, ref('academy_group_student'))]"/>
+            <field name="category_id" ref="module_category_academy"/>
+        </record>
+        
+        <!-- Manager Group -->
+        <record id="academy_group_manager" model="res.groups">
+            <field name="name">Academy Manager</field>
+            <field name="implied_ids" eval="[(4, ref('academy_group_instructor'))]"/>
+            <field name="category_id" ref="module_category_academy"/>
+        </record>
+
+        <record id="rule_academy_course_student_published" model="ir.rule">
+            <field name="name">Courses - students see only published</field>
+            <field name="model_id" ref="academy.model_academy_course"/>
+            <field name="groups" eval="[(4, ref('academy.academy_group_student'))]"/>
+            <field name="domain_force">[('state', '=', 'published')]</field>
+        </record>
+
+        <record id="rule_academy_course_instructor_all" model="ir.rule">
+            <field name="name">Courses - instructors all</field>
+            <field name="model_id" ref="academy.model_academy_course"/>
+            <field name="groups" eval="[(4, ref('academy.academy_group_instructor'))]"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+        </record>
+
+        <record id="rule_academy_course_manager_all" model="ir.rule">
+            <field name="name">Courses - managers all</field>
+            <field name="model_id" ref="academy.model_academy_course"/>
+            <field name="groups" eval="[(4, ref('academy.academy_group_manager'))]"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+        </record>
+
+        <record id="rule_enrollment_student_own" model="ir.rule">
+            <field name="name">Enrollments - student own</field>
+            <field name="model_id" ref="academy.model_academy_enrollment"/>
+            <field name="groups" eval="[(4, ref('academy.academy_group_student'))]"/>
+            <field name="domain_force">[('student_id', '=', user.partner_id.id)]</field>
+        </record>
+
+        <record id="rule_enrollment_instructor_all" model="ir.rule">
+            <field name="name">Enrollments - instructor all</field>
+            <field name="model_id" ref="academy.model_academy_enrollment"/>
+            <field name="groups" eval="[(4, ref('academy.academy_group_instructor'))]"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+        </record>
+
+        <record id="rule_enrollment_manager_all" model="ir.rule">
+            <field name="name">Enrollments - manager all</field>
+            <field name="model_id" ref="academy.model_academy_enrollment"/>
+            <field name="groups" eval="[(4, ref('academy.academy_group_manager'))]"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+        </record>
+
+</odoo>

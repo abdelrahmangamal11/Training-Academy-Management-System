@@ -1,0 +1,194 @@
+<odoo>
+    <record id="view_academy_course_list" model="ir.ui.view">
+        <field name="name">academy.course.list</field>
+        <field name="model">academy.course</field>
+        <field name="arch" type="xml">
+            <list
+                decoration-success="state == 'done'"
+                decoration-info="state == 'in_progress'"
+                decoration-warning="state == 'published'"
+                decoration-danger="is_full"
+            >
+                <field name="name"/>
+                <field name="code"/>
+                <field name="instructor_id"/>
+                <field name="category_id"/>
+                <field name="duration_hours"/>
+                <field name="state"/>
+            </list>
+        </field>
+    </record>
+
+        <record id="view_academy_course_form" model="ir.ui.view">
+        <field name="name">academy.course.form</field>
+        <field name="model">academy.course</field>
+        <field name="arch" type="xml">
+           <form>
+                <header>
+                    <!-- Publish -->
+                    <button name="action_publish"  string="Publish" type="object" class="btn btn-primary" invisible="state != 'draft'"/>
+
+                    <!-- In Progress -->
+                    <button name="action_start" string="In Progress" type="object" class="btn btn-success" invisible="state != 'published'"/>
+
+                    <!-- Complete -->
+                    <button name="action_complete" string="Complete" type="object" class="btn btn-info" invisible="state not in ['in_progress']"/>
+
+                    <!-- Cancel -->
+                    <button name="action_cancel"  string="Cancel" type="object" class="btn btn-danger" invisible="state in ['done', 'cancelled']"/>
+
+                    <!-- Set Draft -->
+                    <button name="action_set_draft" string="Draft" type="object" class="btn btn-warning" invisible="state != 'cancelled'"/>
+
+                    <!-- Statusbar -->
+                    <field name="state" widget="statusbar"  statusbar_visible="draft,published,in_progress,done,cancelled"/>
+                </header>
+                
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" 
+                                type="object" 
+                                name="action_view_enrollments"
+                                icon="fa-users">
+                            <field string="Enrolled Students" name="enrolled_count" widget="statinfo"/>
+                        </button>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="code"/>
+                            <field name="instructor_id"/>
+                        </group>
+                        <group>
+                            <field name="category_id"/>
+                            <field name="duration_hours"/>
+                            <field name="max_students"/> 
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Description">
+                            <field name="description"/>
+                        </page>
+                        <page string="Enrollments">
+                            <field name="enrollment_ids">
+                                <list>
+                                    <field name="student_name"/>
+                                    <field name="course_name"/>
+                                    <field name="state"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                    </sheet>
+                    <chatter>
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="activity_ids" widget="mail_activity"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </chatter>
+                </form>
+        </field>
+    </record>
+
+    <record id="view_academy_course_search" model="ir.ui.view">
+        <field name="name">academy.course.search</field>
+        <field name="model">academy.course</field>
+        <field name="arch" type="xml">
+            <search>
+
+                <field name="name" string="Course Name"/>
+                <field name="code"/>
+                <field name="instructor_id"/>
+                <field name="category_id"/>
+                
+                <filter string="Draft" name="state_draft" domain="[('state','=','draft')]"/>
+                <filter string="Published" name="state_published" domain="[('state','=','published')]"/>
+                <filter string="In Progress" name="state_in_progress" domain="[('state','=','in_progress')]"/>
+                <filter string="Done" name="state_done" domain="[('state','=','done')]"/>
+                <filter string="Full Courses" name="is_full" domain="[('is_full','=',True)]"/>
+                <filter string="Available Courses" name="is_not_full" domain="[('is_full','=',False)]"/>
+
+                <filter string="State" name="group_state" context="{'group_by':'state'}"/>
+
+            </search>
+        </field>
+    </record>
+
+   <record id="view_academy_course_kanban" model="ir.ui.view">
+    <field name="name">academy.course.kanban</field>
+    <field name="model">academy.course</field>
+    <field name="arch" type="xml">
+        <kanban default_group_by="state">
+            <field name="name"/>
+            <field name="code"/>
+            <field name="state"/>
+            <field name="category_id"/>
+            <field name="instructor_id"/>
+            <field name="enrolled_count"/>
+            <field name="max_students"/>
+            <field name="is_full"/>
+
+            <templates>
+                <t t-name="kanban-box">
+                    <div class="o_kanban_record oe_kanban_global_click o_kanban_card">
+
+                        <div class="o_kanban_card_header d-flex justify-content-between align-items-start mb-2">
+                            <div class="small">
+                                Name:
+                                <strong>
+                                    <field name="name"/>
+                                </strong>
+                                Code:
+                                <field name="code"/>
+                            </div>
+
+                            <span class="badge rounded-pill"
+                                  t-att-class="
+                                      record.state.raw_value == 'done' and 'bg-success' or
+                                      record.state.raw_value == 'in_progress' and 'bg-info' or
+                                      record.state.raw_value == 'published' and 'bg-warning' or
+                                      'bg-secondary'
+                                  ">
+                                <field name="state"/>
+                            </span>
+                        </div>
+
+                        <div class="o_kanban_card_body small">
+                            <div class="mb-1">
+                                Category:
+                                <field name="category_id"/>
+                            </div>
+
+                            <div class="mb-1">
+                                Instructor:
+                                <field name="instructor_id"/>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    Enrolled:
+                                    <field name="enrolled_count"/> /
+                                    <field name="max_students"/>
+                                </div>
+
+                                <span t-if="record.is_full.raw_value" class="badge bg-danger">
+                                    Full
+                                </span>
+                            </div>
+                        </div>
+
+                    </div>
+                </t>
+            </templates>
+        </kanban>
+    </field>
+</record>
+
+
+
+    <record id="action_academy_course" model="ir.actions.act_window">
+        <field name="name">Courses</field>
+        <field name="res_model">academy.course</field>
+        <field name="view_mode">list,form,kanban</field>
+    </record>
+
+</odoo>

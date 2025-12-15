@@ -1,0 +1,7 @@
+odoo.conf
+docker-compose.yml
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
