@@ -61,12 +61,14 @@ User management and system administration
 ## Module Structure
 
 academy/
-├── models/ Python models (course, enrollment, category, partner)
-├── views/ XML views and menus
-├── security/ Groups, rules, access rights
-└── static/ Icons and assets
+├── models/ # Python models (course, enrollment, category, partner)
+├── views/ # XML views and menus
+├── security/ # Groups, rules, access rights
+└── static/ # Icons and assets
 
-**Key Models**
+```
+
+### **Key Models:**
 
 academy.course - Courses with workflow and capacity tracking
 
@@ -93,3 +95,4 @@ Test course workflow transitions
 Verify computed fields (enrolled_count, available_seats)
 
 Confirm security rules per role
+```
