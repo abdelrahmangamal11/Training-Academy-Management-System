@@ -1,72 +1,73 @@
-# Training Academy Management System
+// ...existing code...
 
-Lightweight Odoo module bundle for managing courses, categories, enrollments, partners and related products/sales.
+# Academy — Sales / E‑commerce Integration (custom_addons/academy)
+
+Lightweight Odoo addon that links Products to Courses and automatically creates draft Academy enrollments from confirmed Sale Orders while preserving Academy business rules (capacity, uniqueness, workflows).
 
 ## Overview
 
-- Odoo 18 compatible module collection under `addons/academy`.
-- Provides models and views for courses, categories, enrollments, partner data, product templates and sales integration.
+- Product ↔ Course mapping: product.template.course_id (readonly in form; editable via admin wizard).
+- Sales integration: when a sale order is confirmed, for each order line whose product is linked to a course the module creates a draft `academy.enrollment` (student = order.partner_id, course = product.course_id).
+- Academy models (course, category, enrollment, partner) include stored/computed fields, constraints and statusbar workflows; sales integration only creates draft enrollments — Academy workflows enforce capacity and uniqueness.
 
-## Features
+## Module tree (key files)
 
-- Course and category management
-- Enrollment workflows
-- Product templates for courses and related sales
-- Basic security and access control
-- Wizard for product creation
+- **init**.py, **manifest**.py
+- models/
+  - academy_partner.py — partner flags, counters, smart buttons
+  - account_move.py — optional accounting hooks
+  - category.py — course categories
+  - course.py — course model, computed/stored fields, validations, actions, product helper
+  - enrollment.py — enrollment model, computed fields, SQL uniqueness constraint, confirmation checks
+  - product_template.py — adds readonly Many2one `course_id` to product.template
+  - sale_order.py — extends sale.order to create draft enrollments on confirm
+- views/
+  - product_template_views.xml — product form integration
+  - course_views.xml, category_views.xml, enrollment_views.xml, partner_views.xml, menus.xml
+- wizard/
+  - product.py — transient model to create/link products for courses
+  - product_wizard_view.xml — wizard form/action
+- security/
+  - academy_security.xml, ir.model.access.csv
+- tests/ (optional) — unit/integration tests
 
-## Prerequisites
+## Functional flow
 
-- Odoo 18 (this repository includes an Odoo tree in `odoo_18.0.20251224` for reference)
-- Docker & Docker Compose (optional but recommended for quick development)
+1. Admin links a product to a course (Product form or Product Link wizard).
+2. Customer places and confirms a Sale Order containing that product.
+3. On confirm, the module creates a draft `academy.enrollment` for the sale partner and course.
+4. Use Academy UI to confirm enrollment — server-side constraints prevent confirming when the course is full or when duplicate (student, course) exists.
 
-## Quick start (Docker Compose)
+## Quick test checklist
 
-From the project root run:
+- Link a product to a course (via wizard or product form).
+- Create and confirm a Sale Order containing that product → verify a draft `academy.enrollment` exists for the order partner + course.
+- Confirm enrollment in Academy UI — ensure capacity rules block over-enrollment.
+- Try duplicate enrollment for same student+course → SQL constraint should fail.
 
-```bash
-docker compose up -d
-```
+## UI & Actions
 
-Then open Odoo in your browser (usually at http://localhost:8069). Use the web UI to create a database.
+- Product form displays readonly Course field (product_template_views.xml).
+- Course form includes action to open product creation wizard (course.action_create_product).
+- Partner form includes Academy tab and smart buttons to view enrollments/courses (partner_views.xml).
+- Menus available under "Academy" (menus.xml).
 
-## Installing the `academy` module
+## Security & Data Integrity
 
-1. In Odoo go to `Apps` → click `Update Apps List` (or enable developer mode and Update).
-2. Search for `academy` (or `Training Academy`) and click `Install`.
+- Module integrates with Academy security (groups, record rules, ir.model.access.csv).
+- Enrollment SQL constraint prevents duplicate (student_id, course_id).
+- Enrollment confirmation is guarded server-side (ValidationError raised if course is full).
+- Course model contains validations for dates, positive capacity and product linkage checks.
 
-Note: If Odoo does not find the module, ensure the `addons_path` in your Odoo configuration includes this repository's `addons` folder.
+## Developer notes & best practices
 
-## Development notes
-
-- VS Code: a workspace-specific settings file exists at `.vscode/settings.json` that sets `python.analysis.extraPaths` using `${workspaceFolder}` so the language server can resolve Odoo imports. Example value:
-
-```
-${workspaceFolder}/../odoo_18.0.20251224/odoo-18.0.post20251224/odoo/addons
-```
-
-- Odoo config file included: `config/odoo.conf` — adapt paths there as needed.
-
-- Common developer workflow:
-
-```bash
-# rebuild/start containers
-docker compose up -d --build
-
-# follow logs
-docker compose logs -f
-```
-
-## Project structure (key paths)
-
-- `addons/academy/` — the main module code (models, views, security, wizards)
-- `config/odoo.conf` — example Odoo configuration
-- `docker-compose.yml` — service orchestration for local development
-
-## Contributing
-
-Feel free to open issues or pull requests. For code contributions, keep changes focused, add tests when appropriate, and follow the existing module structure.
-
-## License
-
-See repository root files for license information. If none provided, ask the project owner for licensing details before reuse.
+- Keep product.course mapping readonly in production UI; use the wizard for controlled creation/association.
+- Perform all critical checks on server-side (constraints, @api.constrains) — client-side checks are helpful but not sufficient.
+- Use stored computed fields for counts (enrolled_count, available_seats) to optimize report queries.
+- Prefer creating draft enrollments from external channels (sales, website) then confirm them using Academy workflows so existing business rules run.
+- Add/maintain unit tests for:
+  - sale → enrollment creation
+  - enrollment uniqueness constraint
+  - capacity / confirmation blocking
+  - course date and capacity validations
+- If you require strict one-product-per-course mapping enable the commented SQL constraint in product_template.py.
