@@ -79,9 +79,5 @@ class Enrollment(models.Model):
             'type': 'ir.actions.act_window',
             'res_model': 'account.move',
             'view_mode': 'form',
-            'domain': [('enrollment_ids', '=', self.id)],
-            'context': {
-                'default_ref': self.id,
-                'create': True,
-            }
+            'res_id': self.invoice_id.id,
         }

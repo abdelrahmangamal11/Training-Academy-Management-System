@@ -59,7 +59,7 @@
                          <button class="oe_stat_button" 
                                 type="object" 
                                 name="action_view_sales_orders"
-                                icon="fa-shopping-cart">
+                                icon="fa-pencil-square-o">
                             <field string="Sales" name="sale_order_count" widget="statinfo"/>
                         </button>
                     </div>

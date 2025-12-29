@@ -30,7 +30,7 @@
                         <button  class="oe_stat_button" 
                                 type="object" 
                                 name="action_view_invoices"
-                                icon="fa-shopping-cart"
+                                icon="fa-pencil-square-o"
                                 invisible="not invoice_id">
                             <field string="Invoice" name="invoice_id" widget="statinfo" />          
                         </button>
