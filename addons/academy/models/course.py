@@ -10,7 +10,9 @@ class Course(models.Model):
     code= fields.Char(string='Course Code', required=True, index=True)
     description = fields.Text(string='Course Description', tracking=True)
     instructor_id=fields.Many2one('res.partner')
-    category_id=fields.Many2one('academy.course.category', string='Category')   
+    sale_order_ids=fields.One2many('sale.order', 'course_id', string='Sale Order')        
+    category_id=fields.Many2one('academy.course.category', string='Category')
+    product_ids=fields.One2many('product.product', 'course_id', string='Product')
     duration_hours=fields.Float(string='Duration (Hours)')
     max_students=fields.Integer(string='Maximum Students', default=20)
     state=fields.Selection([("draft","Draft"),
@@ -21,13 +23,16 @@ class Course(models.Model):
     start_date=fields.Date(string='Start Date', tracking=True)
     end_date=fields.Date(string='End Date', tracking=True)
     enrollment_ids=fields.One2many("academy.enrollment","course_id",string="Enrollments")
-    enrolled_count=fields.Integer(string='Number of Enrolled Students', compute='_compute_enrolled_count', store=True)
+    enrolled_count=fields.Integer(string='Number of Enrolled Students', compute='_compute_enrolled_count')
     available_seats=fields.Integer(string='Available Seats', compute='_compute_available_seats', store=True)
+    sale_order_count=fields.Integer(string='Sale Order Line', compute='_compute_sale_order_count')
     is_full = fields.Boolean(string='Is Full', compute='_compute_is_full', store=True)
     instructor_name=fields.Char(string='Instructor Name', related='instructor_id.name', store=True)
+    
 
     ## Constraints ##
-    _sql_constraints=[('unique_course-code','unique(code)','code must be unique')]
+    _sql_constraints=[('unique_course-code', 'UNIQUE(code)', 'code must be unique')]
+ 
 
     @api.constrains('start_date', 'end_date')
     def _check_dates(self):
@@ -41,27 +46,46 @@ class Course(models.Model):
             if course.max_students <= 0:
                 raise ValidationError('Maximum Students must be greater than zero.')
 
-    ## Computation Methods ##
+    @api.constrains('product_ids')
+    def _check_product_list(self):
+        for course in self:
+            new_product=self.env['product.product'].search_count([('course_id','=',course.id)])
+            if new_product> 1 :
+                raise ValidationError('the course is connected to just one product.')
+                
+    # Computation Methods ##
 
     @api.onchange('code')
     def _onchange_code_upper(self):
-        if self.code:
-            self.code = self.code.upper()
+        for rec in self:
+            print("the onchange excuted ")          
 
     @api.depends('enrollment_ids')
     def _compute_enrolled_count(self):
         for course in self:
             course.enrolled_count = len(course.enrollment_ids.filtered(lambda e: e.state == 'confirmed'))
+            course.available_seats=5
+            
 
     @api.depends('max_students', 'enrolled_count')
     def _compute_available_seats(self):
         for course in self:
+            print(f"the record of @api.depends ${course}")
             course.available_seats =max(course.max_students - course.enrolled_count, 0)       
     
     @api.depends('available_seats')
     def _compute_is_full(self):
         for course in self:
             course.is_full = course.available_seats <= 0
+
+    @api.depends('sale_order_ids')
+    def _compute_sale_order_count(self):
+        for course in self:
+            course.sale_order_count = self.env['sale.order'].search_count([
+                ('order_line.product_id.course_id', '=', course.id)
+            ])
+
+
 
     ## Action Methods ##
     def action_publish(self):
@@ -73,6 +97,7 @@ class Course(models.Model):
             rec.state = 'in_progress'   
     
     def action_complete(self):      
+        
         for rec in self:
             rec.state = 'done'
 
@@ -84,6 +109,13 @@ class Course(models.Model):
         for rec in self:
             rec.state = 'draft' 
     
+    def action_create_product(self):
+        action = self.env["ir.actions.act_window"]._for_xml_id("academy.action_academy_product_wizard")
+        action["context"]={
+            "default_course_id": self.id
+        }
+        return action
+    
     def action_view_enrollments(self):
         return {
             'name': 'Enrollments',
@@ -93,6 +125,18 @@ class Course(models.Model):
             'domain': [('course_id', '=', self.id)],
             'context': {
                 'default_course_id': self.id,
+                'create': False,
+            }
+        }
+    def action_view_sales_orders(self):
+        return{
+            'name': 'Sales Orders',
+            'type': 'ir.actions.act_window',
+            'res_model': 'sale.order',
+            'view_mode': 'list,form',
+            'domain': [('order_line.product_id.course_id', '=', self.id)],
+            'context': {
+                'default_course_ids': self.id,
                 'create': True,
             }
         }

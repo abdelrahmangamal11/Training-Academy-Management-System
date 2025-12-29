@@ -8,6 +8,7 @@
                 <field name="course_name"/>
                 <field name="enrollment_date"/>
                 <field name="state"/>
+                <field name="invoice_id"/>
             </list>
         </field>
     </record>
@@ -18,8 +19,6 @@
         <field name="arch" type="xml">
            <form>
                 <header>
-                        <button name="action_confirm" string="Confirm" type="object" 
-                                class="btn-primary" invisible="state != 'draft'"/>
                         <button name="action_complete" string="Complete" type="object" 
                                 class="btn-success" invisible="state != 'confirmed'"/>
                         <button name="action_cancel" string="Cancel" type="object" 
@@ -27,6 +26,15 @@
                         <field name="state" widget="statusbar" clickable="1"/>
                 </header>
                 <sheet>
+                    <div class='oe_button_box' name='button_box'>
+                        <button  class="oe_stat_button" 
+                                type="object" 
+                                name="action_view_invoices"
+                                icon="fa-shopping-cart"
+                                invisible="not invoice_id">
+                            <field string="Invoice" name="invoice_id" widget="statinfo" />          
+                        </button>
+                    </div>
                     <group>
                         <group>
                             <field name="student_id"/>

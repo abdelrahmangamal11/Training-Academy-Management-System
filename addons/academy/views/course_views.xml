@@ -15,6 +15,7 @@
                 <field name="category_id"/>
                 <field name="duration_hours"/>
                 <field name="state"/>
+                <field name="available_seats" readonly="1" string="available seats"/>
             </list>
         </field>
     </record>
@@ -25,6 +26,9 @@
         <field name="arch" type="xml">
            <form>
                 <header>
+
+                    <button name="action_create_product" string="Generate Product" type="object" class="btn btn-primary"/>
+
                     <!-- Publish -->
                     <button name="action_publish"  string="Publish" type="object" class="btn btn-primary" invisible="state != 'draft'"/>
 
@@ -52,6 +56,12 @@
                                 icon="fa-users">
                             <field string="Enrolled Students" name="enrolled_count" widget="statinfo"/>
                         </button>
+                         <button class="oe_stat_button" 
+                                type="object" 
+                                name="action_view_sales_orders"
+                                icon="fa-shopping-cart">
+                            <field string="Sales" name="sale_order_count" widget="statinfo"/>
+                        </button>
                     </div>
                     <group>
                         <group>
@@ -77,6 +87,9 @@
                                     <field name="state"/>
                                 </list>
                             </field>
+                        </page>
+                        <page string="Products">
+                                <field name='product_ids' widget="many2many"/>
                         </page>
                     </notebook>
                     </sheet>
@@ -117,7 +130,7 @@
     <field name="name">academy.course.kanban</field>
     <field name="model">academy.course</field>
     <field name="arch" type="xml">
-        <kanban default_group_by="state">
+        <kanban >
             <field name="name"/>
             <field name="code"/>
             <field name="state"/>
@@ -137,8 +150,12 @@
                                 <strong>
                                     <field name="name"/>
                                 </strong>
-                                Code:
-                                <field name="code"/>
+                            </div>
+                            <div class="small"> 
+                                Code
+                                <strong>
+                                    <field name="code"/>
+                                </strong>
                             </div>
 
                             <span class="badge rounded-pill"
@@ -178,12 +195,11 @@
 
                     </div>
                 </t>
+               
             </templates>
         </kanban>
     </field>
 </record>
-
-
 
     <record id="action_academy_course" model="ir.actions.act_window">
         <field name="name">Courses</field>

@@ -26,12 +26,12 @@
                     </group>
                     <notebook>
                         <page string="Courses">
-                            <field name="course_ids">
-                                <list string="Courses" editable="bottom">
+                            <field name="course_ids" widget="many2many">
+                                <list string="Courses" editable="bottom">  
                                     <field name="name"/>
                                     <field name="code"/>
                                     <field name="instructor_id"/>
-                                    <field name="state" widget="badge"/>
+                                    <field name="state" widget="many2many"/>
                                 </list>
                             </field>
                         </page>

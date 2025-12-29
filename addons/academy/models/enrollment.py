@@ -6,9 +6,10 @@ class Enrollment(models.Model):
     _name="academy.enrollment"
 
     ## Fields ##
-    student_id = fields.Many2one(  'res.partner',string='Student',required=True)
+    student_id = fields.Many2one( 'res.partner',string='Student',required=True)
     course_id = fields.Many2one( 'academy.course', string='Course',required=True)
     enrollment_date = fields.Date(string='Enrollment Date')
+    invoice_id=fields.Many2one('account.move', string='Invoice', readonly=True)
     state = fields.Selection(
         [
             ('draft', 'Draft'),
@@ -57,7 +58,7 @@ class Enrollment(models.Model):
 
     ## Action Methods ##
     def action_confirm(self):
-        for rec in self:
+        for rec in self: 
             rec.state = 'confirmed'   
 
     def action_cancel(self):
@@ -67,3 +68,20 @@ class Enrollment(models.Model):
     def action_complete(self):
         for rec in self:
             rec.state = 'completed' 
+
+    def test_onchange(self):
+        for rec in self:
+            rec.course_id.code.upper() 
+
+    def action_view_invoices(self):
+        return{
+            'name':'Invoice',
+            'type': 'ir.actions.act_window',
+            'res_model': 'account.move',
+            'view_mode': 'form',
+            'domain': [('enrollment_ids', '=', self.id)],
+            'context': {
+                'default_ref': self.id,
+                'create': True,
+            }
+        }

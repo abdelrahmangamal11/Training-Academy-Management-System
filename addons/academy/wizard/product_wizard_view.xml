@@ -1,0 +1,26 @@
+<odoo>
+    <record id="view_academy_product_wizard_form" model="ir.ui.view">
+        <field name="name">academy.product.wizard.form</field>
+        <field name="model">academy.product</field>
+        <field name="arch" type="xml">
+            <form string="Product Wizard">
+                <group>
+                    <field name="course_id"/>
+                    <field name="name"/>
+                    <field name="price"/>
+                </group>
+                <footer>
+                     <button string="Create Product" class="btn-primary" type="object" name="action_create_product"/>
+                     <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_academy_product_wizard" model="ir.actions.act_window">
+        <field name="name">Create Academy Product</field>
+        <field name="res_model">academy.product</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>  <!-- to view the wizard pop-up window -->  
+    </record>
+</odoo>
