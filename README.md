@@ -1,5 +1,3 @@
-// ...existing code...
-
 # Academy — Sales / E‑commerce Integration (custom_addons/academy)
 
 Lightweight Odoo addon that links Products to Courses and automatically creates draft Academy enrollments from confirmed Sale Orders while preserving Academy business rules (capacity, uniqueness, workflows).
