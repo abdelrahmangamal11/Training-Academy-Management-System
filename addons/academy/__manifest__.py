@@ -15,6 +15,12 @@
         'views/partner_views.xml',
         'views/product_template_views.xml',
         'views/menus.xml',
+        'report/certificate_report.xml',
+        "report/course_enrollment.xml",
+        'wizard/enrollment_report_wizard_view.xml',
+        "report/enrollment_report_date.xml",
+        "report/student_transcript_report.xml"
+        
     ],
     'application': True,
 }

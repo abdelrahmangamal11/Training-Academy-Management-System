@@ -44,6 +44,9 @@
                     <!-- Set Draft -->
                     <button name="action_set_draft" string="Draft" type="object" class="btn btn-warning" invisible="state != 'cancelled'"/>
 
+                    <!-- Wizard Print -->
+                    <button  name="action_print_report" type="object" string="Print" class="btn-primary" groups="academy.academy_group_instructor,academy.academy_group_manager"/>
+
                     <!-- Statusbar -->
                     <field name="state" widget="statusbar"  statusbar_visible="draft,published,in_progress,done,cancelled"/>
                 </header>
@@ -87,9 +90,6 @@
                                     <field name="state"/>
                                 </list>
                             </field>
-                        </page>
-                        <page string="Products">
-                                <field name='product_ids' widget="many2many"/>
                         </page>
                     </notebook>
                     </sheet>

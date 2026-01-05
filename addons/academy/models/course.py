@@ -12,7 +12,7 @@ class Course(models.Model):
     instructor_id=fields.Many2one('res.partner')
     sale_order_ids=fields.One2many('sale.order', 'course_id', string='Sale Order')        
     category_id=fields.Many2one('academy.course.category', string='Category')
-    product_ids=fields.One2many('product.product', 'course_id', string='Product')
+    product_id=fields.Many2one('product.product', string='Product')
     duration_hours=fields.Float(string='Duration (Hours)')
     max_students=fields.Integer(string='Maximum Students', default=20)
     state=fields.Selection([("draft","Draft"),
@@ -52,6 +52,11 @@ class Course(models.Model):
             new_product=self.env['product.product'].search_count([('course_id','=',course.id)])
             if new_product> 1 :
                 raise ValidationError('the course is connected to just one product.')
+
+    # @api.constrains('code')
+    # def _chack_uppercase_code(self):
+    #     for rec in self:
+    #         rec.code=rec.code.upper()      
                 
     # Computation Methods ##
 
@@ -85,6 +90,7 @@ class Course(models.Model):
                 ('order_line.product_id.course_id', '=', course.id)
             ])
 
+           
 
 
     ## Action Methods ##
@@ -140,6 +146,10 @@ class Course(models.Model):
                 'create': True,
             }
         }
+    
+    def action_print_report(self):
+        action = self.env["ir.actions.act_window"]._for_xml_id("academy.action_enrollment_report_wizard")
+        return action
     
             
     

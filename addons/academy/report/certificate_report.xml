@@ -1,0 +1,86 @@
+<odoo>
+    <record id="report_certificate" model="ir.actions.report">
+        <field name="name">Certificate</field>
+        <field name="model">academy.enrollment</field>
+        <field name="report_type">qweb-html</field>
+        <field name="report_name">academy.report_certificate_template</field>
+        <field name="binding_model_id" ref="academy.model_academy_enrollment"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_certificate_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page" style="border: 2px solid #000">
+                        <div class="text-center" style="margin-top: 50px;">
+                            <!-- Certificate Title -->
+                            <h1 style="font-size: 48px; color: #2c3e50; font-weight: bold;">Certificate of Completion</h1>
+                            <p style="font-size: 18px; margin-top: 30px; color: #7f8c8d;">This is to certify that</p>
+                            
+                            <!-- Student Name -->
+                            <h2 style="font-size: 36px; color: #3498db; margin: 20px 0; font-weight: bold;">
+                                <span t-field="o.student_id.name"/>
+                            </h2>
+                            
+                            <!-- Course Info -->
+                            <p style="font-size: 18px; color: #7f8c8d;">has successfully completed the course</p>
+                            <h3 style="font-size: 28px; color: #2c3e50; margin: 20px 0; font-weight: bold;">
+                                <span t-field="o.course_id.name"/>
+                            </h3>
+                            
+                            <!-- Course Details -->
+                            <div style="margin-top: 40px; font-size: 16px; color: #34495e;">
+                                <t t-if="o.course_id.instructor_id">
+                                    <p style="margin: 10px 0;">
+                                        Instructor: <strong><span t-field="o.course_id.instructor_id.name"/></strong>
+                                    </p>
+                                </t>
+                                
+                                <t t-if="o.grade">
+                                    <p style="margin: 10px 0;">
+                                        Grade Achieved: <strong><span t-field="o.grade"/></strong>
+                                    </p>
+                                </t>
+                                
+                                <t t-if="o.enrollment_date">
+                                    <p style="margin: 10px 0;">
+                                        Enrollment Date: <strong><span t-field="o.enrollment_date"/></strong>
+                                    </p>
+                                </t>
+                            </div>
+                            
+                            <!-- Certificate Number and Date -->
+                            <div style="margin-top: 50px; font-size: 14px; color: #7f8c8d;">
+                                <p style="margin: 5px 0;">
+                                    Certificate ID: <strong><span t-esc="o.id"/></strong>
+                                </p>
+                                <p style="margin: 5px 0;">
+                                    Issue Date: <strong><span t-esc="context_timestamp(datetime.datetime.now()).strftime('%B %d, %Y')"/></strong>
+                                </p>
+                            </div>
+                            
+                            <!-- Signature Section -->
+                            <div style="margin-top: 80px; display: flex; justify-content: space-around;">
+                                <div style="text-align: center;">
+                                    <div style="border-top: 2px solid #000; width: 200px; margin: 0 auto;"></div>
+                                    <p style="margin-top: 10px; font-size: 14px; color: #34495e;">
+                                        <strong>Instructor Signature</strong><br/>
+                                        <span t-field="o.course_id.instructor_id.name"/>
+                                    </p>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="border-top: 2px solid #000; width: 200px; margin: 0 auto;"></div>
+                                    <p style="margin-top: 10px; font-size: 14px; color: #34495e;">
+                                        <strong>Date</strong><br/>
+                                        <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%B %d, %Y')"/>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

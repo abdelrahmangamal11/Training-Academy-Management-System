@@ -36,6 +36,7 @@ class Enrollment(models.Model):
  
 
     ## Computation Methods ##
+    @api.constrains('grade', 'attendance_percentage')
     def _compute_passed(self):
         passing_grade = 60.0
         passing_attendance=75.0  
@@ -81,3 +82,7 @@ class Enrollment(models.Model):
             'view_mode': 'form',
             'res_id': self.invoice_id.id,
         }
+    
+    def action_print_certificate(self):
+        self.ensure_one()
+        return self.env.ref('academy.report_certificate').report_action(self)
