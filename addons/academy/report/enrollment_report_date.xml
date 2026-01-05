@@ -1,8 +1,9 @@
 <odoo>
     <record id="report_enrollment_date" model="ir.actions.report">
         <field name="model">academy.course</field>
-        <field name="report_type">qweb-html</field>
+        <field name="report_type">qweb-pdf</field>
         <field name="report_name">academy.report_enrollment_date_template</field>
+        <field name="report_file">academy.report_enrollment_date_template</field>
         <field name="binding_model_id" ref="academy.model_academy_course"/>
         <field name="binding_type">report</field>
     </record>

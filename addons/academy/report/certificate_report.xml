@@ -2,8 +2,9 @@
     <record id="report_certificate" model="ir.actions.report">
         <field name="name">Certificate</field>
         <field name="model">academy.enrollment</field>
-        <field name="report_type">qweb-html</field>
+        <field name="report_type">qweb-pdf</field>
         <field name="report_name">academy.report_certificate_template</field>
+        <field name="report_file">academy.report_certificate_template</field>
         <field name="binding_model_id" ref="academy.model_academy_enrollment"/>
         <field name="binding_type">report</field>
     </record>

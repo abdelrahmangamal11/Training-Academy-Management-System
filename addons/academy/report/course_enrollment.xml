@@ -2,8 +2,9 @@
     <record id="report_course_enrollment" model="ir.actions.report">
         <field name="name">Course Enrollment Report</field>
         <field name="model">academy.course</field>
-        <field name="report_type">qweb-html</field>
+        <field name="report_type">qweb-pdf</field>
         <field name="report_name">academy.report_course_enrollment_template</field>
+        <field name="report_file">academy.report_course_enrollment_template</field>
         <field name="binding_model_id" ref="academy.model_academy_course"/>
         <field name="binding_type">report</field>
     </record>
