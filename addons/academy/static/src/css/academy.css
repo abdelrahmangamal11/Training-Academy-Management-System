@@ -1,0 +1,7 @@
+.custome_header th {
+  background-color: aqua !important;
+  color: black !important;
+}
+.custome_header table thead > tr > th:nth-child(1) {
+  width: 50px;
+}

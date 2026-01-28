@@ -32,8 +32,8 @@ class Enrollment(models.Model):
     student_name=fields.Char(string='Student Name', related='student_id.name', store=True)
     course_name=fields.Char(string='Course Name', related='course_id.name', store=True)
     passed = fields.Boolean(string='Passed', compute='_compute_passed', store=True)
+    active=fields.Boolean(default=True)
 
- 
 
     ## Computation Methods ##
     @api.constrains('grade', 'attendance_percentage')

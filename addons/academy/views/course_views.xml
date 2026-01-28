@@ -7,7 +7,8 @@
                 decoration-success="state == 'done'"
                 decoration-info="state == 'in_progress'"
                 decoration-warning="state == 'published'"
-                decoration-danger="is_full"
+                decoration-danger="is_full or is_late"
+                class="custome_header"
             >
                 <field name="name"/>
                 <field name="code"/>
@@ -26,9 +27,16 @@
         <field name="arch" type="xml">
            <form>
                 <header>
+                    <!-- <button name="generate_test_data" 
+                                type="object" 
+                                string="توليد داتا محاسبية" 
+                                class="btn-primary" 
+                                confirm="هل تريد ملء النظام ببيانات تجريبية للمحاسبة؟"/> -->
+
+                    <button name="action" string="Action" type="object" class="btn btn-primary"/>
 
                     <button name="action_create_product" string="Generate Product" type="object" class="btn btn-primary"/>
-
+                    
                     <!-- Publish -->
                     <button name="action_publish"  string="Publish" type="object" class="btn btn-primary" invisible="state != 'draft'"/>
 
@@ -48,7 +56,8 @@
                     <button  name="action_print_report" type="object" string="Print" class="btn-primary" groups="academy.academy_group_instructor,academy.academy_group_manager"/>
 
                     <!-- Statusbar -->
-                    <field name="state" widget="statusbar"  statusbar_visible="draft,published,in_progress,done,cancelled"/>
+                    <field name="state" widget="statusbar" />
+                   
                 </header>
                 
                 <sheet>
@@ -69,13 +78,21 @@
                     <group>
                         <group>
                             <field name="name"/>
+                            <field name="ref"/>
                             <field name="code"/>
+                            <field name="expected_selling_date"/>
                             <field name="instructor_id"/>
+                            <field name="instructor_phone"/>
+                            <field name="instructor_tax_id"/>
                         </group>
                         <group>
                             <field name="category_id"/>
                             <field name="duration_hours"/>
                             <field name="max_students"/> 
+                            <field name="start_date"/>
+                            <field name="end_date"/>
+                            <field name="active"/>
+                            <field name="is_late"/>
                         </group>
                     </group>
                     <notebook>
@@ -83,7 +100,7 @@
                             <field name="description"/>
                         </page>
                         <page string="Enrollments">
-                            <field name="enrollment_ids">
+                            <field name="enrollment_ids" widget="many2many">
                                 <list>
                                     <field name="student_name"/>
                                     <field name="course_name"/>
@@ -200,6 +217,24 @@
         </kanban>
     </field>
 </record>
+
+    <record id="server_action_course_closed" model="ir.actions.server">
+      <field name="name"> Closed </field>
+      <field name="model_id" ref="model_academy_course"/>
+      <field name="binding_model_id" ref="model_academy_course"/>
+      <field name="state">code</field>
+      <field name="code">action=record.action_close()</field>
+    </record>
+
+    <record id="cron_check_selling_date" model="ir.cron">
+      <field name="name"> Course:Check Selling Date </field>
+      <field name="model_id" ref="model_academy_course"/>
+      <field name="state">code</field>
+      <field name="code">model.check_selling_date()</field>
+      <field name="interval_type">days</field>
+      <field name="interval_number">1</field>
+      <field name="active">True</field> 
+    </record>
 
     <record id="action_academy_course" model="ir.actions.act_window">
         <field name="name">Courses</field>

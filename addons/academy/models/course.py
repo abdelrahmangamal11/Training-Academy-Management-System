@@ -1,5 +1,7 @@
+import random
+from datetime import datetime, timedelta
 from odoo import models, fields, api
-from odoo.exceptions import ValidationError
+from odoo.exceptions import ValidationError, UserError # ضفنا UserError هنا
 
 class Course(models.Model):  
     _name="academy.course"
@@ -7,6 +9,7 @@ class Course(models.Model):
     
     ## Fields ##
     name = fields.Char(string='Course Name', required=True, tracking=True)
+    ref=fields.Char(string='Reference', default='New',  required=True)
     code= fields.Char(string='Course Code', required=True, index=True)
     description = fields.Text(string='Course Description', tracking=True)
     instructor_id=fields.Many2one('res.partner')
@@ -19,8 +22,11 @@ class Course(models.Model):
                             ("published","Published"),
                             ('in_progress','In_progress'),
                             ('done','Done'),
-                            ('cancelled','Cancelled')],default="draft",tracking=True)
+                            ('cancelled','Cancelled'),
+                            ('closed','Closed')],default="draft",tracking=True)
     start_date=fields.Date(string='Start Date', tracking=True)
+    expected_selling_date=fields.Date(string='Expected Selling Date', tracking=True)
+    is_late=fields.Boolean(string='Is Late')
     end_date=fields.Date(string='End Date', tracking=True)
     enrollment_ids=fields.One2many("academy.enrollment","course_id",string="Enrollments")
     enrolled_count=fields.Integer(string='Number of Enrolled Students', compute='_compute_enrolled_count')
@@ -28,6 +34,9 @@ class Course(models.Model):
     sale_order_count=fields.Integer(string='Sale Order Line', compute='_compute_sale_order_count')
     is_full = fields.Boolean(string='Is Full', compute='_compute_is_full', store=True)
     instructor_name=fields.Char(string='Instructor Name', related='instructor_id.name', store=True)
+    instructor_phone=fields.Char(string='Instructor Phone',related='instructor_id.vat', store=True)
+    instructor_tax_id=fields.Char(string='Instructor Tax ID',related='instructor_id.phone', store=True)
+    active=fields.Boolean(default=True)
     
 
     ## Constraints ##
@@ -37,8 +46,9 @@ class Course(models.Model):
     @api.constrains('start_date', 'end_date')
     def _check_dates(self):
         for course in self:
-            if  course.end_date < course.start_date:
-                raise ValidationError('End Date cannot be earlier than Start Date.')        
+            if course.start_date and course.end_date:
+             if course.end_date < course.start_date:
+                raise ValidationError('End Date cannot be earlier than Start Date.')      
 
     @api.constrains('max_students')
     def _check_max_students(self):
@@ -46,12 +56,12 @@ class Course(models.Model):
             if course.max_students <= 0:
                 raise ValidationError('Maximum Students must be greater than zero.')
 
-    @api.constrains('product_ids')
-    def _check_product_list(self):
-        for course in self:
-            new_product=self.env['product.product'].search_count([('course_id','=',course.id)])
-            if new_product> 1 :
-                raise ValidationError('the course is connected to just one product.')
+    # @api.constrains('product_ids')
+    # def _check_product_list(self):
+    #     for course in self:
+    #         new_product=self.env['product.product'].search_count([('course_id','=',course.id)])
+    #         if new_product> 1 :
+    #             raise ValidationError('the course is connected to just one product.')
 
     # @api.constrains('code')
     # def _chack_uppercase_code(self):
@@ -91,8 +101,6 @@ class Course(models.Model):
             ])
 
            
-
-
     ## Action Methods ##
     def action_publish(self):
         for rec in self:
@@ -115,6 +123,10 @@ class Course(models.Model):
         for rec in self:
             rec.state = 'draft' 
     
+    def action_close(self):
+        for rec in self:
+            rec.state = 'closed' 
+
     def action_create_product(self):
         action = self.env["ir.actions.act_window"]._for_xml_id("academy.action_academy_product_wizard")
         action["context"]={
@@ -147,9 +159,81 @@ class Course(models.Model):
             }
         }
     
+    def check_selling_date(self): # بتشاور على ال model نفسه مش ال recordset فهحتاج اعمل هنا loop معين او search لي set اشتغل عليها #
+        course_ids=self.search([])
+        for course in course_ids:
+            if course.expected_selling_date and course.expected_selling_date < fields.Date.today():
+                course.is_late = True   
+
     def action_print_report(self):
         action = self.env["ir.actions.act_window"]._for_xml_id("academy.action_enrollment_report_wizard")
         return action
     
+    def action(self):
+        print("###########################################\n")
+        print(self.env.user)
+        print("###########################################\n")
+        print(self.env.user.name)
+        print("###########################################\n")
+        print(self.env.user.partner_id.phone)
+   
+    @api.model
+    def create(self,vals):
+        res=super(Course,self).create(vals)
+        if res.ref=='New':
+            res.ref = self.env['ir.sequence'].next_by_code('academy_seq')
+        return res
+
+
+    def generate_test_data(self):
+        # 1. تجهيز البيانات الأساسية
+        partner = self.env['res.partner'].search([], limit=1)
+        # مجلة المبيعات والمشتريات
+        sale_journal = self.env['account.journal'].search([('type', '=', 'sale')], limit=1)
+        purchase_journal = self.env['account.journal'].search([('type', '=', 'purchase')], limit=1)
+        
+        if not partner or not sale_journal or not purchase_journal:
+            raise UserError("تأكد من وجود عميل واحد على الأقل وإعداد مجلات البيع والشراء في الحسابات!")
+
+        # 2. توليد 30 فاتورة مبيعات (إيرادات)
+        for i in range(30):
+            invoice_date = datetime.now() - timedelta(days=random.randint(0, 60))
+            self.env['account.move'].create({
+                'move_type': 'out_invoice', # فاتورة عميل
+                'partner_id': partner.id,
+                'journal_id': sale_journal.id,
+                'date': invoice_date.date(),
+                'invoice_date': invoice_date.date(),
+                'invoice_line_ids': [(0, 0, {
+                    'name': f'كورس برمجة - {i}',
+                    'quantity': 1,
+                    'price_unit': random.uniform(500, 2000),
+                })],
+            }).action_post() # ترحيل عشان تظهر في التقارير
+
+        # 3. توليد 20 فاتورة مشتريات (مصاريف)
+        for j in range(20):
+            bill_date = datetime.now() - timedelta(days=random.randint(0, 60))
+            self.env['account.move'].create({
+                'move_type': 'in_invoice', # فاتورة مورد
+                'partner_id': partner.id, # ممكن تستخدم نفس الشريك للتجربة
+                'journal_id': purchase_journal.id,
+                'date': bill_date.date(),
+                'invoice_date': bill_date.date(),
+                'invoice_line_ids': [(0, 0, {
+                    'name': f'مصاريف صيانة - {j}',
+                    'quantity': 1,
+                    'price_unit': random.uniform(100, 500),
+                })],
+            }).action_post()
+
+        return {
+            'effect': {
+                'fadeout': 'slow',
+                'message': "تم ضخ 50 عملية مبيعات ومصاريف.. راجع تقاريرك الآن!",
+                'type': 'rainbow_man',
+            }
+        }
+
             
     

@@ -28,7 +28,7 @@ class Partner(models.Model):
             'name': 'Student Enrollments',
             'type': 'ir.actions.act_window',
             'res_model': 'academy.enrollment',
-            'view_mode': 'tree,form',
+            'view_mode': 'list,form',
             'domain': [('student_id', '=', self.id)],
             'context': {'default_student_id': self.id}
         }

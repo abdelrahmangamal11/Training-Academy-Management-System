@@ -8,7 +8,7 @@ Lightweight Odoo addon that links Products to Courses and automatically creates 
 - Sales integration: when a sale order is confirmed, for each order line whose product is linked to a course the module creates a draft `academy.enrollment` (student = order.partner_id, course = product.course_id).
 - Academy models (course, category, enrollment, partner) include stored/computed fields, constraints and statusbar workflows; sales integration only creates draft enrollments — Academy workflows enforce capacity and uniqueness.
 
-## Module tree (key files)
+## Module list (key files)
 
 - **init**.py, **manifest**.py
 - models/

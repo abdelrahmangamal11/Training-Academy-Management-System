@@ -1,0 +1,94 @@
+.o_academy_ai_chat .o_form_sheet {
+  max-width: 100% !important;
+  width: 95% !important;
+  height: 90vh !important;
+  margin: 10px auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  padding: 0 !important;
+  background-color: #f3f4f6 !important;
+  border-radius: 16px !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08) !important;
+}
+
+.o_chat_main_wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.o_chat_messages {
+  flex: 1;
+  overflow-y: auto !important;
+  padding: 40px 15% !important;
+}
+
+.o_user_bubble {
+  background: #374151 !important;
+  color: white !important;
+  padding: 12px 20px;
+  border-radius: 18px 18px 4px 18px;
+  margin-left: auto;
+  width: fit-content;
+  max-width: 70%;
+  margin-bottom: 20px;
+}
+
+.o_ai_bubble {
+  background: #d6dadf !important;
+  color: #111827 !important;
+  border-radius: 18px 18px 4px 18px;
+  padding: 12px 20px;
+  margin-left: auto;
+  width: fit-content;
+  width: 100%;
+  margin-bottom: 30px;
+}
+
+.ai_label {
+  color: #374151;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.o_chat_input_section {
+  padding: 20px 15% 40px 15% !important;
+}
+
+.o_claude_input_box {
+  background: #d6dadf !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 20px !important;
+  display: flex !important;
+  align-items: center;
+  padding: 10px 15px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+}
+
+.o_chat_input_field {
+  border: none !important;
+  flex: 1;
+  font-size: 15px !important;
+  color: #000000 !important;
+}
+
+.my_custom_send_btn {
+  background-color: #374151 !important;
+  color: white !important;
+  border-radius: 8px !important;
+  transition: all 0.3s ease;
+}
+
+.o_kanban_view .o_kanban_record {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.o_academy_ai_chat .o_kanban_record {
+  pointer-events: none !important;
+  cursor: default !important;
+}

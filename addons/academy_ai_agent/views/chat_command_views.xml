@@ -1,0 +1,144 @@
+<odoo>
+    <record id="action_chat_session" model="ir.actions.act_window">
+        <field name="name">Gemy AI Assistant</field>
+        <field name="res_model">academy.chat.session</field>
+        <field name="view_mode">list,form</field>
+        <field name="target">current</field>
+    </record>
+
+    <record id="view_academy_chat_session_form" model="ir.ui.view">
+        <field name="name">academy.chat.session.form</field>
+        <field name="model">academy.chat.session</field>
+        <field name="arch" type="xml">
+            <form string="AI Assistant" class="o_academy_ai_chat">
+                <sheet>
+                    <div class="o_chat_main_wrapper">
+                        <div class="o_chat_messages">
+                            <field name="history_ids" mode="kanban" nolabel="1" readonly="1"  options="{'no_open': True}">
+                                <kanban>
+                                    <field name="message"/>
+                                    <field name="response"/>
+                                    <templates>
+                                        <t t-name="kanban-box">
+                                            <div  style="display: block; border: none; background: transparent; width: 100%; pointer-events: none;">
+                                                
+                                                <div class="o_chat_bubble_container user_msg_wrap" style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
+                                                    <div class="o_user_bubble">
+                                                        <t t-esc="record.message.value"/>
+                                                    </div>
+                                                </div>
+
+                                                <div class="o_chat_bubble_container ai_msg_wrap" t-if="record.response.raw_value" style="display: flex; justify-content: flex-start; margin-bottom: 10px;">
+                                                    <div class="o_ai_bubble">
+                                                        <strong class="ai_label">AI Assistant:</strong>
+                                                        <div>
+                                                            <t t-out="record.response.value"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </t>
+                                    </templates>
+                                </kanban>
+                            </field>
+                         </div>
+
+                        <div class="o_chat_input_section">
+                            <div class="o_claude_input_box">
+                                <field name="new_message" 
+                                       placeholder="Ask Gemy anything..." 
+                                       nolabel="1" 
+                                       class="o_chat_input_field"/>
+                                
+                                <div class="o_input_buttons">
+                                    <button name="action_send_and_notify" 
+                                            type="object" 
+                                            class="my_custom_send_btn" 
+                                            icon="fa-paper-plane"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <menuitem id="menu_academy_ai_root" name="AI Assistant" parent="academy.menu_academy_root" sequence="10"/>
+    <menuitem id="menu_academy_ai_chat" name="Chat" parent="menu_academy_ai_root" action="action_chat_session" sequence="10"/>
+</odoo>
+
+
+
+
+<!-- <odoo>
+    <record id="view_chat_command_list" model="ir.ui.view">
+        <field name="name">academy.chat.command.list</field>
+        <field name="model">academy.chat.command</field>
+        <field name="arch" type="xml">
+            <list string="AI Chat History">
+                <field name="create_date"/>
+                <field name="message"/>
+                <field name="state" widget="badge" decoration-success="state == 'done'" decoration-info="state == 'draft'"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_academy_chat_command_form" model="ir.ui.view">
+        <field name="name">academy.chat.command.form</field>
+        <field name="model">academy.chat.command</field>
+        <field name="arch" type="xml">
+            <form string="AI Assistant" class="o_academy_ai_chat"> 
+                <sheet>
+                    <div class="o_chat_main_wrapper">
+                        <div class="o_chat_messages">           
+                            <div class="o_chat_bubble_container user_msg_wrap">
+                                <div class="o_user_bubble">
+                                    <field name="message" readonly="1" nolabel="1"/>
+                                </div>
+                            </div>
+                            <div class="o_chat_bubble_container ai_msg_wrap" invisible="not response">
+                                <div class="o_ai_bubble">
+                                    <strong class="ai_label">AI Assistant</strong>
+                                    <field name="response" widget="html" readonly="1" nolabel="1"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="o_chat_input_section">
+                            <div class="o_claude_input_box">
+                                <field name="message" 
+                                       placeholder="Ask Gemy anything..."
+                                       readonly="state == 'processing'"
+                                       nolabel="1"
+                                       class="o_chat_input_field"/>
+                    
+                                <div class="o_input_buttons">
+                                    <button name="process_command" 
+                                            type="object" 
+                                            class=" my_custom_send_btn"
+                                            icon="fa-paper-plane"
+                                            invisible="state == 'processing'"/>
+                                    
+                                    <button string="Send" 
+                                            class="btn_send_claude loading" 
+                                            icon="fa-spinner fa-spin"
+                                            invisible="state != 'processing'"
+                                            disabled="1"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_chat_command" model="ir.actions.act_window">
+        <field name="name">Academy AI Assistant</field>
+        <field name="res_model">academy.chat.command</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="menu_academy_ai_root" name="AI Assistant" parent="academy.menu_academy_root" sequence="10"/>
+    <menuitem id="menu_academy_ai_chat" name="Chat" parent="menu_academy_ai_root" action="action_chat_command" sequence="10"/>
+</odoo> -->
