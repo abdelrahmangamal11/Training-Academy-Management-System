@@ -1,0 +1,38 @@
+services:
+  web:
+    image: odoo:18.0-20251222
+    container_name: odoo-academy
+    depends_on:
+      - db
+    ports:
+      - "8069:8069"
+    environment:
+      - PYTHONUNBUFFERED=1
+      - HOST=db
+      - USER=odoo
+      - PASSWORD=odoo
+    command: -u academy -d AbdelrahmanDB --dev xml
+    volumes:
+      - odoo-web-data:/var/lib/odoo
+      - ./config:/etc/odoo
+      - ./addons:/mnt/extra-addons
+      - D:\Odoo-Addons\addons-18:/mnt/entrprise
+    restart: always
+
+  db:
+    image: postgres:16
+    ports:
+      - "5435:5432"
+    container_name: postgres-Academy
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=odoo
+      - POSTGRES_PASSWORD=odoo
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - odoo-db-data:/var/lib/postgresql/data/pgdata
+    restart: always
+
+volumes:
+  odoo-web-data:
+  odoo-db-data:
