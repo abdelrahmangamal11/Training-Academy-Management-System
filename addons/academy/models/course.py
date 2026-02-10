@@ -108,23 +108,27 @@ class Course(models.Model):
     
     def action_start(self):
         for rec in self:
+            rec.create_history_record(rec.state,'in_progress')
             rec.state = 'in_progress'   
     
     def action_complete(self):      
-        
         for rec in self:
+            rec.create_history_record(rec.state,'done')
             rec.state = 'done'
 
     def action_cancel(self):
         for rec in self:
+            rec.create_history_record(rec.state,'cancelled')
             rec.state = 'cancelled' 
     
     def action_set_draft(self):
         for rec in self:
+            rec.create_history_record(rec.state,'draft')
             rec.state = 'draft' 
     
     def action_close(self):
         for rec in self:
+            rec.create_history_record(rec.state,'closed')
             rec.state = 'closed' 
 
     def action_create_product(self):
@@ -172,6 +176,8 @@ class Course(models.Model):
     def action(self):
         print("###########################################\n")
         print(self.env.user)
+        print(self.env.uid)
+        print(self.env.user.id)
         print("###########################################\n")
         print(self.env.user.name)
         print("###########################################\n")
@@ -183,6 +189,15 @@ class Course(models.Model):
         if res.ref=='New':
             res.ref = self.env['ir.sequence'].next_by_code('academy_seq')
         return res
+    
+    def create_history_record(self,old_state,new_state):
+        self.env['academy.course.history'].create({
+            'user_id': self.env.uid,
+            'course_id': self.id,
+            'old_state': old_state,
+            'new_state': new_state,
+        })
+
 
 
     def generate_test_data(self):

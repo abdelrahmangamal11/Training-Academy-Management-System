@@ -1,11 +1,12 @@
 import json
 from openai import OpenAI
 from odoo.exceptions import UserError
+import os
 
 class AIParserService:
     def __init__(self):
         # 1. ضع مفتاح Groq هنا بدلاً من OpenAI
-        self.api_key = "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" 
+        self.api_key = os.getenv("GROQ_API_KEY")
         
         # 2. نقوم بتوجيه المكتبة للاتصال بسيرفر Groq بدلاً من سيرفر OpenAI
         self.client = OpenAI(
@@ -14,6 +15,7 @@ class AIParserService:
         )
 
     def parse(self, message):
+
         system_prompt = """
             You are "Gemy", the smart and helpful AI Administrator of Odoo Training Academy and you are an AI Financial & Academy Expert in Odoo.
             Your goal is to assist users in managing courses while being friendly and professional.
@@ -24,6 +26,7 @@ class AIParserService:
             - Respond in the SAME language the user used. If they spoke Arabic, reply in friendly Arabic. If they spoke English, reply in professional English.
             - Make your response creative and varied every time. Do not repeat the same phrase.
             - Return this JSON: {"action": "chat", "message": "Your creative bilingual response here..."}
+
             2. IF the user wants to create a course:
             - Extract data and return this JSON: 
                 {
@@ -35,6 +38,7 @@ class AIParserService:
                 "end_date": "YYYY-MM-DD",
                 "success_msg": "A creative, custom confirmation message in the user's language (English or Arabic) informing them the course is ready."
                 }
+
             3.IF the user asks about money, profit, loss, income, expenses, or financial performance (even in slang like "كسبنا كام" or "تقرير مالي"):
             - ALWAYS return: {"action": "get_accounting_report", "period": "this_month"}
             - Extract the period if mentioned (e.g., 'this month', 'last year').

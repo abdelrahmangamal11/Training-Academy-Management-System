@@ -10,8 +10,12 @@
 
         <menuitem id="menu_academy_session" name="Sessions" parent="menu_academy_dropdown_courses" sequence="20" action="action_academy_session"/>
 
+        <menuitem id="menu_academy_course_history" name="Course History" parent="menu_academy_dropdown_courses" sequence="10" action="action_academy_course_history"/>
+
         <menuitem id="menu_academy_dropdown_enrollments" name="Enrollment" parent="menu_academy_root" sequence="20"/>
 
         <menuitem id="menu_academy_enrollments" name="Enrollments" parent="menu_academy_dropdown_enrollments" sequence="10" action="action_academy_enrollment"/>
+
+       
 
 </odoo>

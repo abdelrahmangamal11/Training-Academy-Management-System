@@ -16,6 +16,7 @@
         'views/partner_views.xml',
         'views/product_template_views.xml',
         'views/sessions_views.xml',
+        'views/course_history_views.xml',
         'views/menus.xml',
         'report/certificate_report.xml',
         "report/course_enrollment.xml",
